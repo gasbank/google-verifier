@@ -17,10 +17,12 @@ export const verifyGooglePlay = functions.https.onRequest(async (request, respon
     if (process.env.GOOGLE_APPLICATION_CREDENTIALS_STRING) {
         keys = process.env.GOOGLE_APPLICATION_CREDENTIALS_STRING
     } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-        keys = fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, { encoding: 'utf-8' })
+        keys = fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, {encoding: 'utf-8'})
+    } else if (functions.config().service && functions.config().service.cred) {
+        keys = Buffer.from(functions.config().service.cred, 'base64').toString('utf8');
     } else {
         response.statusCode = 503;
-        response.send("Application credentials not found");
+        response.send("Invalid application credentials.");
         return;
     }
 
@@ -99,7 +101,8 @@ export const verifyGooglePlay = functions.https.onRequest(async (request, respon
             && verificationResult.data.orderId === orderId
             && verificationResult.data.acknowledgementState === 1
             && verificationResult.data.purchaseState === 0
-            && verificationResult.data.purchaseTimeMillis === purchaseTime.toString()) {
+            && verificationResult.data.purchaseTimeMillis
+            && Math.abs(parseInt(verificationResult.data.purchaseTimeMillis) - purchaseTime) < 5 * 60 * 1000) {
             // Valid receipt
             response.statusCode = 200;
             response.send(JSON.stringify(verificationResult.data));

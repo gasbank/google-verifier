@@ -7,10 +7,13 @@ const assert = chai.assert;
 
 chai.use(chaiHttp);
 
+const baseUrl = 'http://localhost:5001';
+const getUrl = '/laidoff-c49a1/us-central1/verifyGooglePlay';
+
 describe('verifyGooglePlay', () => {
     it('should fail with empty receipt', (done) => {
-        chai.request('http://localhost:5001')
-            .get('/laidoff-c49a1/us-central1/verifyGooglePlay')
+        chai.request(baseUrl)
+            .get(getUrl)
             .end((err, res) => {
                 assert.equal(res.status, 400);
                 assert.equal(res.text, 'Invalid receipt-to-be-verified header.');
@@ -19,8 +22,8 @@ describe('verifyGooglePlay', () => {
     });
 
     it('should fail with invalid JSON receipt', (done) => {
-        chai.request('http://localhost:5001')
-            .get('/laidoff-c49a1/us-central1/verifyGooglePlay')
+        chai.request(baseUrl)
+            .get(getUrl)
             .set('receipt-to-be-verified', 'hello world')
             .end((err, res) => {
                 assert.equal(res.status, 400);
@@ -36,8 +39,8 @@ describe('verifyGooglePlay', () => {
         };
         const receiptBase64 = Buffer.from(JSON.stringify(receipt), 'utf8').toString('base64');
 
-        chai.request('http://localhost:5001')
-            .get('/laidoff-c49a1/us-central1/verifyGooglePlay')
+        chai.request(baseUrl)
+            .get(getUrl)
             .set('receipt-to-be-verified', receiptBase64)
             .end((err, res) => {
                 assert.equal(res.status, 400);
@@ -53,8 +56,8 @@ describe('verifyGooglePlay', () => {
         };
         const receiptBase64 = Buffer.from(JSON.stringify(receipt), 'utf8').toString('base64');
 
-        chai.request('http://localhost:5001')
-            .get('/laidoff-c49a1/us-central1/verifyGooglePlay')
+        chai.request(baseUrl)
+            .get(getUrl)
             .set('receipt-to-be-verified', receiptBase64)
             .end((err, res) => {
                 assert.equal(res.status, 400);
@@ -70,8 +73,8 @@ describe('verifyGooglePlay', () => {
         };
         const receiptBase64 = Buffer.from(JSON.stringify(receipt), 'utf8').toString('base64');
 
-        chai.request('http://localhost:5001')
-            .get('/laidoff-c49a1/us-central1/verifyGooglePlay')
+        chai.request(baseUrl)
+            .get(getUrl)
             .set('receipt-to-be-verified', receiptBase64)
             .end((err, res) => {
                 assert.equal(res.status, 400);
@@ -88,8 +91,8 @@ describe('verifyGooglePlay', () => {
         };
         const receiptBase64 = Buffer.from(JSON.stringify(receipt), 'utf8').toString('base64');
 
-        chai.request('http://localhost:5001')
-            .get('/laidoff-c49a1/us-central1/verifyGooglePlay')
+        chai.request(baseUrl)
+            .get(getUrl)
             .set('receipt-to-be-verified', receiptBase64)
             .end((err, res) => {
                 assert.equal(res.status, 400);
@@ -108,8 +111,8 @@ describe('verifyGooglePlay', () => {
         };
         const receiptBase64 = Buffer.from(JSON.stringify(receipt), 'utf8').toString('base64');
 
-        chai.request('http://localhost:5001')
-            .get('/laidoff-c49a1/us-central1/verifyGooglePlay')
+        chai.request(baseUrl)
+            .get(getUrl)
             .set('receipt-to-be-verified', receiptBase64)
             .end((err, res) => {
                 assert.equal(res.status, 400);
@@ -129,8 +132,8 @@ describe('verifyGooglePlay', () => {
         };
         const receiptBase64 = Buffer.from(JSON.stringify(receipt), 'utf8').toString('base64');
 
-        chai.request('http://localhost:5001')
-            .get('/laidoff-c49a1/us-central1/verifyGooglePlay')
+        chai.request(baseUrl)
+            .get(getUrl)
             .set('receipt-to-be-verified', receiptBase64)
             .end((err, res) => {
                 assert.equal(res.status, 400);
