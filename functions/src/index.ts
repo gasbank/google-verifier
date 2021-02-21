@@ -98,7 +98,7 @@ export const verifyGooglePlay = functions.https.onRequest(async (request, respon
         const verificationResult = await publisher.purchases.products.get(params);
 
         if (verificationResult.data.kind === "androidpublisher#productPurchase"
-            && verificationResult.data.orderId === orderId
+            && (verificationResult.data.orderId === orderId || (!verificationResult.data.orderId && !orderId))
             && verificationResult.data.acknowledgementState === 1
             && verificationResult.data.purchaseState === 0
             && verificationResult.data.purchaseTimeMillis
@@ -108,10 +108,12 @@ export const verifyGooglePlay = functions.https.onRequest(async (request, respon
             response.send(JSON.stringify(verificationResult.data));
         } else {
             response.statusCode = 400;
+            //response.send("Not verified.\n" + JSON.stringify(verificationResult));
             response.send("Not verified.");
         }
     } catch (e) {
         response.statusCode = 400;
+        //response.send("Not verified with exception.\n" + e);
         response.send("Not verified with exception.");
     }
 });
