@@ -117,3 +117,15 @@ export const verifyGooglePlay = functions.https.onRequest(async (request, respon
         response.send("Not verified with exception.");
     }
 });
+
+export const authorizeAppleLogin = functions.https.onRequest(async (request, response) => {
+    // Check for POST request
+    if(request.method !== "POST"){
+        response.status(400).send('Please send a POST request');
+        return;
+    }
+
+    const postData = request.body;
+    response.statusCode = 200;
+    response.send(postData);
+});
