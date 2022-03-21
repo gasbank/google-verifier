@@ -15,11 +15,17 @@ export const verifyGooglePlay = functions.https.onRequest(async (request, respon
 
     let keys = "";
     if (process.env.GOOGLE_APPLICATION_CREDENTIALS_STRING) {
-        keys = process.env.GOOGLE_APPLICATION_CREDENTIALS_STRING
+        keys = process.env.GOOGLE_APPLICATION_CREDENTIALS_STRING;
+        functions.logger.log("Key type 1");
+    } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS_BASE64) {
+        keys = Buffer.from(process.env.GOOGLE_APPLICATION_CREDENTIALS_BASE64, 'base64').toString('utf8');
+        functions.logger.log("Key type 3");
     } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-        keys = fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, {encoding: 'utf-8'})
-    } else if (functions.config().service && functions.config().service.cred) {
+        keys = fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, {encoding: 'utf-8'});
+        functions.logger.log("Key type 2");
+    } else if (functions.config().service && functions.config().service.cred) { // 이 방법은 예전 방법이 되었다.
         keys = Buffer.from(functions.config().service.cred, 'base64').toString('utf8');
+        functions.logger.log("Key type 4");
     } else {
         response.statusCode = 503;
         response.send("Invalid application credentials.");
@@ -70,10 +76,13 @@ export const verifyGooglePlay = functions.https.onRequest(async (request, respon
         return;
     }
 
+    functions.logger.log("== receiptPayloadJsonJson ==");
+    functions.logger.log(receiptPayloadJsonJson);
+
     const packageName = receiptPayloadJsonJson.packageName;
     const productId = receiptPayloadJsonJson.productId;
     const token = receiptPayloadJsonJson.purchaseToken;
-    const orderId = receiptPayloadJsonJson.orderId;
+    //const orderId = receiptPayloadJsonJson.orderId;
     const purchaseTime = receiptPayloadJsonJson.purchaseTime;
 
     const authClient = auth.fromJSON(keysJson);
@@ -97,8 +106,13 @@ export const verifyGooglePlay = functions.https.onRequest(async (request, respon
     try {
         const verificationResult = await publisher.purchases.products.get(params);
 
+        functions.logger.log("== verificationResult ==");
+        functions.logger.log(verificationResult);
+
         if (verificationResult.data.kind === "androidpublisher#productPurchase"
-            && (verificationResult.data.orderId === orderId || (!verificationResult.data.orderId && !orderId))
+            // 클라이언트에서 제공한 orderId는 사실은 transaction id이고, verificationResult.data.orderId만 진짜 GPA로 시작하는 제대로 된 값이다.
+            // 그러므로 검증 시 이 두 값은 비교할 수 없다.
+            //&& (verificationResult.data.orderId === orderId || (!verificationResult.data.orderId && !orderId))
             && verificationResult.data.acknowledgementState === 1
             && verificationResult.data.purchaseState === 0
             && verificationResult.data.purchaseTimeMillis
